@@ -3,22 +3,24 @@ using EFCoreCountryCity.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Linq;
+using System.Threading.Tasks;
+using System;
 
 namespace EFCoreCountryCity.Controllers
 {
     public class CityController : Controller
     {
         private readonly ICityService _cityService;
-        private readonly IBaseService<Country> _countryService;
+        private readonly ICountryService _countryService;
 
-        public CityController(ICityService cityService, IBaseService<Country> contryService)
+        public CityController(ICityService cityService, ICountryService contryService)
         {
             _cityService = cityService;
             _countryService = contryService;
         }
 
         // GET: CityController
-        public ActionResult Index(string sortOrder, string searchItem, string currentFilter, int? pageNumber)
+        public async Task<ActionResult> IndexAsync(string sortOrder, string searchItem, string currentFilter, int? pageNumber)
         {
             ViewData["NameSort"] = string.IsNullOrEmpty(sortOrder) ? "Name_Desc" : "";
             ViewData["PopulationSort"] = sortOrder == "Population" ? "Population_Desc" : "Population";
@@ -35,7 +37,7 @@ namespace EFCoreCountryCity.Controllers
             }
             ViewData["CurrentFilter"] = searchItem;
 
-            var cities = from c in _cityService.GetAll()
+            var cities = from c in await _cityService.GetAllAsync()
                          select c;
             if (!string.IsNullOrEmpty(searchItem))
             {
@@ -70,30 +72,30 @@ namespace EFCoreCountryCity.Controllers
             }
 
             int pageSize = 3;
-            return View(PaginatedList<City>.Create(cities.AsQueryable(),pageNumber??1,pageSize));
+            return View(PaginatedList<City>.Create(cities.AsQueryable(), pageNumber ?? 1, pageSize));
         }
 
         // GET: CityController/Details/5
-        public ActionResult Details(int id)
+        public async Task<ActionResult> DetailsAsync(int id)
         {
-            return View(_cityService.Get(id));
+            return View(await _cityService.GetAsync(id));
         }
 
-        // GET: CityController/Create
-        public ActionResult Create()
+        // GET: CityController/CreateAsync
+        public async Task<ActionResult> CreateAsync()
         {
-            ViewData["Countries"] = new SelectList(_countryService.GetAll(), "Id", "Name");
+            ViewData["Countries"] = new SelectList(await _countryService.GetAllAsync(), "Id", "Name");
             return View();
         }
 
-        // POST: CityController/Create
+        // POST: CityController/CreateAsync
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(City city)
+        public async Task<ActionResult> CreateAsync(City city)
         {
             try
             {
-                _cityService.Create(city);
+                await _cityService.CreateAsync(city);
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -103,20 +105,20 @@ namespace EFCoreCountryCity.Controllers
         }
 
         // GET: CityController/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> EditAsync(int id)
         {
-            ViewData["Countries"] = new SelectList(_countryService.GetAll(), "Id", "Name");
-            return View(_cityService.Get(id));
+            ViewData["Countries"] = new SelectList(await _countryService.GetAllAsync(), "Id", "Name");
+            return View(await _cityService.GetAsync(id));
         }
 
         // POST: CityController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, City city)
+        public async Task<ActionResult> EditAsync(int id, City city)
         {
             try
             {
-                _cityService.Update(city);
+                await _cityService.UpdateAsync(city);
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -125,20 +127,20 @@ namespace EFCoreCountryCity.Controllers
             }
         }
 
-        // GET: CityController/Delete/5
-        public ActionResult Delete(int id)
+        // GET: CityController/DeleteAsync/5
+        public async Task<ActionResult> DeleteAsync(int id)
         {
-            return View(_cityService.Get(id));
+            return View(await _cityService.GetAsync(id));
         }
 
-        // POST: CityController/Delete/5
+        // POST: CityController/DeleteAsync/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, City city)
+        public async Task<ActionResult> DeleteAsync(int id, City city)
         {
             try
             {
-                _cityService.Delete(city);
+                await _cityService.DeleteAsync(city);
                 return RedirectToAction(nameof(Index));
             }
             catch

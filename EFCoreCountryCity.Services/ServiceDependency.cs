@@ -6,8 +6,8 @@ namespace EFCoreCountryCity.Services
     {
         public static IServiceCollection AddDependencies(this IServiceCollection services)
         {
-            services.AddTransient(typeof(IBaseService<>), typeof(BaseService<>));
             services.AddTransient<ICityService, CityService>();
+            services.AddTransient<ICountryService, CountryService>();
             return services;
         }
     }

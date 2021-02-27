@@ -1,29 +1,30 @@
-﻿
-
-using EFCoreContryCity.Models;
+﻿using EFCoreContryCity.Models;
 using EFCoreCountryCity.Services;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace EFCoreCountryCity.Controllers
 {
     public class CountryController : Controller
     {
-        private readonly IBaseService<Country> _countryService;
-        public CountryController(IBaseService<Country> countryService)
+        private readonly ICountryService _countryService;
+        public CountryController(ICountryService countryService)
         {
             _countryService = countryService;
         }
         // GET: CountryController
-        public ActionResult Index(string sortOrder,string searchItem, string currenFilter,int? pageNumber)
+        public async Task<ActionResult> IndexAsync(string sortOrder, string searchItem, string currenFilter, int? pageNumber)
         {
             ViewData["NameSort"] = string.IsNullOrEmpty(sortOrder) ? "Name" : "";
             ViewData["CapitalSort"] = sortOrder == "Capital" ? "Capital_Desc" : "Capital";
             ViewData["PresidentSort"] = sortOrder == "President" ? "President_Desc" : "President";
-            ViewData["PopulationSort"] = sortOrder == "Population"? "Population_Desc" : "Population";
-            ViewData["LanguageSort"] = sortOrder == "Language"? "Language_Desc" : "Language";
+            ViewData["PopulationSort"] = sortOrder == "Population" ? "Population_Desc" : "Population";
+            ViewData["LanguageSort"] = sortOrder == "Language" ? "Language_Desc" : "Language";
             ViewData["CurenetSort"] = currenFilter;
-            if (searchItem !=null)
+            if (searchItem != null)
             {
                 pageNumber = 1;
             }
@@ -34,7 +35,7 @@ namespace EFCoreCountryCity.Controllers
 
             ViewData["Filter"] = searchItem;
 
-            var country = from c in _countryService.GetAll()
+            var country = from c in await _countryService.GetAllAsync()
                           select c;
             if (!string.IsNullOrEmpty(searchItem))
             {
@@ -78,25 +79,25 @@ namespace EFCoreCountryCity.Controllers
         }
 
         // GET: CountryController/Details/5
-        public ActionResult Details(int id)
+        public async Task<ActionResult> DetailsAsync(int id)
         {
-            return View(_countryService.Get(id));
+            return View(await _countryService.GetAsync(id));
         }
 
-        // GET: CountryController/Create
+        // GET: CountryController/CreateAsync
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: CountryController/Create
+        // POST: CountryController/CreateAsync
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Country country)
+        public async Task<ActionResult> CreateAsync(Country country)
         {
             try
             {
-                _countryService.Create(country);
+                await _countryService.CreateAsync(country);
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -106,19 +107,19 @@ namespace EFCoreCountryCity.Controllers
         }
 
         // GET: CountryController/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> EditAsync(int id)
         {
-            return View(_countryService.Get(id));
+            return View(await _countryService.GetAsync(id));
         }
 
         // POST: CountryController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, Country country)
+        public async Task<ActionResult> EditAsync(int id, Country country)
         {
             try
             {
-                _countryService.Update(country);
+                await _countryService.UpdateAsync(country);
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -127,20 +128,20 @@ namespace EFCoreCountryCity.Controllers
             }
         }
 
-        // GET: CountryController/Delete/5
-        public ActionResult Delete(int id)
+        // GET: CountryController/DeleteAsync/5
+        public async Task<ActionResult> DeleteAsync(int id)
         {
-            return View(_countryService.Get(id));
+            return View(await _countryService.GetAsync(id));
         }
 
-        // POST: CountryController/Delete/5
+        // POST: CountryController/DeleteAsync/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, Country country)
+        public async Task<ActionResult> DeleteAsync(int id, Country country)
         {
             try
             {
-                _countryService.Delete(country);
+                await _countryService.DeleteAsync(country);
                 return RedirectToAction(nameof(Index));
             }
             catch

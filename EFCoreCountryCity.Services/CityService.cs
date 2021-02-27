@@ -2,7 +2,7 @@
 using EFCoreCountryCity.Services.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace EFCoreCountryCity.Services
 {
@@ -11,15 +11,15 @@ namespace EFCoreCountryCity.Services
         public CityService(EFCoreCountryCityContext context) : base(context)
         {
         }
-        public override IEnumerable<City> GetAll()
+        public override async Task<IEnumerable<City>> GetAllAsync()
         {
-            var result = _context.City.Include(x => x.Country);
-            return result;
+            var result = _context.City.Include(c => c.Country);
+            return await result.ToListAsync();
         }
-        public override City Get(int? id)
+        public override async Task<City> GetAsync(int? id)
         {
-            var result = _context.City.Include(x => x.Country);
-            return result.SingleOrDefault(x => x.Id == id);
+            var result = _context.City.Include(c => c.Country).SingleOrDefaultAsync(c=>c.Id==id);
+            return await result;
         }
     }
 }

@@ -3,7 +3,7 @@ using EFCoreCountryCity.Services.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace EFCoreCountryCity.Services
 {
@@ -17,35 +17,35 @@ namespace EFCoreCountryCity.Services
             _entities = _context.Set<T>();
         }
 
-        public virtual int Create(T model)
+        public async Task<int> CreateAsync(T model)
         {
             if (model == null) throw new ArgumentNullException("Model is null");
-            _entities.Add(model);
-            return _context.SaveChanges();
+            await _entities.AddAsync(model);
+            return await _context.SaveChangesAsync();
         }
 
-        public virtual int Delete(T model)
+        public async Task<int> DeleteAsync(T model)
         {
             if (model == null) throw new ArgumentNullException("Model is null");
             _entities.Remove(model);
-            return _context.SaveChanges();
+            return await _context.SaveChangesAsync();
         }
 
-        public virtual T Get(int? id)
+        public virtual async Task<T> GetAsync(int? id)
         {
-            return _entities.SingleOrDefault(x=>x.Id==id);
+            return await _entities.SingleOrDefaultAsync(x => x.Id == id);
         }
 
-        public virtual  IEnumerable<T> GetAll()
+        public virtual async Task<IEnumerable<T>> GetAllAsync()
         {
-            return _entities.AsEnumerable();
+            return await _entities.ToListAsync();
         }
 
-        public virtual int Update(T model)
+        public async Task<int> UpdateAsync(T model)
         {
             if (model == null) throw new ArgumentNullException("Model is null");
             _entities.Update(model);
-            return _context.SaveChanges();
+            return await _context.SaveChangesAsync();
         }
     }
 }
